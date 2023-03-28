@@ -207,6 +207,25 @@ endif()
 add_library(sentencepiece-static STATIC ${SPM_SRCS})
 add_library(sentencepiece_train-static STATIC ${SPM_TRAIN_SRCS})
 
+if(APPLE)
+  add_library(sentencepiece-apple STATIC ${SPM_SRCS})
+
+  # ABI version
+  # http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html
+  set(SONAME 10)
+  set_target_properties(sentencepiece-apple PROPERTIES
+    SOVERSION ${SONAME}
+    VERSION ${SONAME}.0.0
+  )
+
+  set_target_properties(sentencepiece-apple PROPERTIES
+    FRAMEWORK TRUE
+    FRAMEWORK_VERSION A
+    MACOSX_FRAMEWORK_IDENTIFIER google.sentencepiece
+    PUBLIC_HEADER "chat.h;ggml.h;utils.h;llm.h"
+  )
+endif()
+
 target_link_libraries(sentencepiece-static INTERFACE ${SPM_LIBS})
 target_link_libraries(sentencepiece_train-static INTERFACE sentencepiece-static ${SPM_LIBS})
 
@@ -334,10 +353,14 @@ if (SPM_COVERAGE)
   add_dependencies(coverage spm_test)
 endif()
 
-if (CMAKE_SYSTEM_NAME STREQUAL "iOS")
-  set_xcode_property(spm_encode PRODUCT_BUNDLE_IDENTIFIER "SentencePiece" All)
-  set_xcode_property(spm_decode PRODUCT_BUNDLE_IDENTIFIER "SentencePiece" All)
-  set_xcode_property(spm_normalize PRODUCT_BUNDLE_IDENTIFIER "SentencePiece" All)
-  set_xcode_property(spm_train PRODUCT_BUNDLE_IDENTIFIER "SentencePiece" All)
-  set_xcode_property(spm_export_vocab PRODUCT_BUNDLE_IDENTIFIER "SentencePiece" All)
-endif()
+# It does not make sense to build the applications for
+# iOS/tvOS/watchOS. By commenting out the following, we could remove
+# the dependency to cmake/ios.toolchain.cmake
+#
+# if (CMAKE_SYSTEM_NAME STREQUAL "iOS")
+#   set_xcode_property(spm_encode PRODUCT_BUNDLE_IDENTIFIER "SentencePiece" All)
+#   set_xcode_property(spm_decode PRODUCT_BUNDLE_IDENTIFIER "SentencePiece" All)
+#   set_xcode_property(spm_normalize PRODUCT_BUNDLE_IDENTIFIER "SentencePiece" All)
+#   set_xcode_property(spm_train PRODUCT_BUNDLE_IDENTIFIER "SentencePiece" All)
+#   set_xcode_property(spm_export_vocab PRODUCT_BUNDLE_IDENTIFIER "SentencePiece" All)
+# endif()
