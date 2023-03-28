@@ -106,8 +106,8 @@ function merge_fat_static_library() {
     src_label=$2
     dst_label=$1
 
-    src="$BUILD_DIR"/$src_label/src/$PROJECT-apple.framework/$PROJECT-apple
-    dst="$BUILD_DIR"/$dst_label/src/$PROJECT-apple.framework/$PROJECT-apple
+    src="$BUILD_DIR"/$src_label/src/$PROJECT.framework/$PROJECT
+    dst="$BUILD_DIR"/$dst_label/src/$PROJECT.framework/$PROJECT
 
     if lipo -info "$dst" | grep 'Non-fat' >/dev/null; then
         echo "┌------------------------------------------------------------------------------┐"
@@ -162,12 +162,12 @@ echo "  Aggregating frameworks into an xcframework ..."
 echo "└------------------------------------------------------------------------------┘"
 rm -rf "$XCFRAMEWORK"
 xcodebuild -create-xcframework \
-    -framework "$BUILD_DIR"/macos-arm64/src/$PROJECT-apple.framework \
-    -framework "$BUILD_DIR"/ios-sim-arm64/src/$PROJECT-apple.framework \
-    -framework "$BUILD_DIR"/ios-dev-arm64/src/$PROJECT-apple.framework \
-    -framework "$BUILD_DIR"/tv-sim-arm64/src/$PROJECT-apple.framework \
-    -framework "$BUILD_DIR"/tv-dev-arm64/src/$PROJECT-apple.framework \
-    -framework "$BUILD_DIR"/watch-sim-arm64/src/$PROJECT-apple.framework \
-    -framework "$BUILD_DIR"/watch-dev-arm64/src/$PROJECT-apple.framework \
+    -framework "$BUILD_DIR"/macos-arm64/src/$PROJECT.framework \
+    -framework "$BUILD_DIR"/ios-sim-arm64/src/$PROJECT.framework \
+    -framework "$BUILD_DIR"/ios-dev-arm64/src/$PROJECT.framework \
+    -framework "$BUILD_DIR"/tv-sim-arm64/src/$PROJECT.framework \
+    -framework "$BUILD_DIR"/tv-dev-arm64/src/$PROJECT.framework \
+    -framework "$BUILD_DIR"/watch-sim-arm64/src/$PROJECT.framework \
+    -framework "$BUILD_DIR"/watch-dev-arm64/src/$PROJECT.framework \
     -output "$XCFRAMEWORK"
 tree -L 1 -d "$XCFRAMEWORK"

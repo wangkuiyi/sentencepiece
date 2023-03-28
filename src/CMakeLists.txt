@@ -199,11 +199,6 @@ if (SPM_ENABLE_TCMALLOC)
   endif()
 endif()
 
-if (SPM_ENABLE_SHARED)
-  add_library(sentencepiece SHARED ${SPM_SRCS})
-  add_library(sentencepiece_train SHARED ${SPM_TRAIN_SRCS})
-endif()
-
 add_library(sentencepiece-static STATIC ${SPM_SRCS})
 add_library(sentencepiece_train-static STATIC ${SPM_TRAIN_SRCS})
 
@@ -218,17 +213,17 @@ if(APPLE)
   # ${_SRC_HEADERS_FULLPATH}, however, we want the fullpath of header
   # files here so we could set MACOSX_PACKAGE_LOCATION in the
   # following loop. Therefore, we add ${_SRC_HEADERS_FULLPATH}.
-  add_library(sentencepiece-apple STATIC ${SPM_SRCS} ${_SRC_HEADERS_FULLPATH})
+  add_library(sentencepiece STATIC ${SPM_SRCS} ${_SRC_HEADERS_FULLPATH})
 
   # ABI version
   # http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html
   set(SONAME 10)
-  set_target_properties(sentencepiece-apple PROPERTIES
+  set_target_properties(sentencepiece PROPERTIES
     SOVERSION ${SONAME}
     VERSION ${SONAME}.0.0
   )
 
-  set_target_properties(sentencepiece-apple PROPERTIES
+  set_target_properties(sentencepiece PROPERTIES
     FRAMEWORK TRUE
     FRAMEWORK_VERSION A
     MACOSX_FRAMEWORK_IDENTIFIER google.sentencepiece
