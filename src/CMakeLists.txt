@@ -208,7 +208,17 @@ add_library(sentencepiece-static STATIC ${SPM_SRCS})
 add_library(sentencepiece_train-static STATIC ${SPM_TRAIN_SRCS})
 
 if(APPLE)
-  add_library(sentencepiece-apple STATIC ${SPM_SRCS})
+  set(_HEADER_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+  message(INFO "_HEADER_SOURCE_DIR ${_HEADER_SOURCE_DIR}") # debug
+
+  file(GLOB_RECURSE _SRC_HEADERS_FULLPATH "${_HEADER_SOURCE_DIR}/*.h")
+  message(INFO "_SRC_HEADERS_FULLPATH ${_SRC_HEADERS_FULLPATH}")
+
+  # It is true that ${SPM_SRCS} already includes files listed by
+  # ${_SRC_HEADERS_FULLPATH}, however, we want the fullpath of header
+  # files here so we could set MACOSX_PACKAGE_LOCATION in the
+  # following loop. Therefore, we add ${_SRC_HEADERS_FULLPATH}.
+  add_library(sentencepiece-apple STATIC ${SPM_SRCS} ${_SRC_HEADERS_FULLPATH})
 
   # ABI version
   # http://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html
@@ -222,8 +232,18 @@ if(APPLE)
     FRAMEWORK TRUE
     FRAMEWORK_VERSION A
     MACOSX_FRAMEWORK_IDENTIFIER google.sentencepiece
-    PUBLIC_HEADER "chat.h;ggml.h;utils.h;llm.h"
+    XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED OFF
+    # We do not need PUBLIC_HEADER here because we will set
+    # MACOSX_PACKAGE_LOCATION for each header file listed in the above
+    # add_library.
   )
+
+  foreach(_HEADER ${_SRC_HEADERS_FULLPATH})
+    string(REPLACE ${_HEADER_SOURCE_DIR} "" _HEADER_RELPATH ${_HEADER})
+    get_filename_component(_REL_DIR "${_HEADER_RELPATH}" DIRECTORY)
+    set_source_files_properties(
+      ${_HEADER} PROPERTIES MACOSX_PACKAGE_LOCATION Headers/${_REL_DIR})
+  endforeach()
 endif()
 
 target_link_libraries(sentencepiece-static INTERFACE ${SPM_LIBS})

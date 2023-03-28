@@ -98,7 +98,7 @@ function build_for_macos() {
 	    -DSPM_ENABLE_SHARED=OFF \
 	    -DSPM_ENABLE_TCMALLOC=OFF \
             -DCMAKE_OSX_ARCHITECTURES="$arch" >"$build_dir"/build.log 2>&1
-        cmake --build "$build_dir" >"$build_dir"/build.log 2>&1
+        cmake --build "$build_dir" >>"$build_dir"/build.log 2>&1
     fi
 }
 
